@@ -1,34 +1,98 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const Filter = (props) => {
+  const handlerFilter = (event) => {
+    props.setFilter(event.target.value.toLowerCase()); 
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      filter shown with <input value={props.filter} onChange={handlerFilter} />
     </>
+  )
+}
+
+const PersonForm = (props) => {
+  const handlerNewName = (event) => {
+    props.setNewName(event.target.value)
+  }
+
+  const handlerNewNumber = (event) => {
+    props.setNewNumber(event.target.value)
+  }
+
+  return (
+    <>
+      <form onSubmit={props.onSubmit}>
+        <div>
+          name: <input value={props.newName} onChange={handlerNewName}/>
+        </div>
+        <div>
+          number: <input value={props.newNumber} onChange={handlerNewNumber}/>
+        </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+    </>
+  )
+}
+
+const People = (props) => {
+  const filteredPersons = props.persons.filter((person) =>
+    person.name.toLowerCase().includes(props.filter)
+  );
+
+  return (
+    <>
+      {filteredPersons.map((person) => (
+          <p key={person.id}>
+            {person.name} {person.number}
+          </p>
+        ))}
+    </>
+  )
+}
+
+const App = (props) => {
+  const [persons, setPersons] = useState([
+    { name: 'Arto Hellas', number: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
+  ]) 
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [filter, setFilter] = useState('')
+
+
+  const addPerson = (event) => {
+    event.preventDefault()
+    
+    const newPerson = {
+      id: persons.length + 1,
+      name: newName,
+      number: newNumber,
+    }
+
+    let jaExiste = persons.some(person => JSON.stringify(person.name) === JSON.stringify(newPerson.name));
+
+    if (!jaExiste)
+      setPersons([...persons, ...[newPerson]])
+    else
+      alert(`${newName} is already added to phonebook`)
+
+  }
+
+  return (
+    <div>
+      <h2>Phonebook</h2>
+      <Filter filter={filter} setFilter={setFilter}/>
+      <h3>add a new</h3>
+      <PersonForm onSubmit={addPerson} newName={newName} newNumber={newNumber} setNewName={setNewName} setNewNumber={setNewNumber} />
+      <h2>Numbers</h2>
+      <People persons={persons} filter={filter} />
+    </div>
   )
 }
 
