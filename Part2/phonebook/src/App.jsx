@@ -40,19 +40,22 @@ const PersonForm = (props) => {
 }
 
 const People = (props) => {
-  const filteredPersons = props.persons.filter((person) =>
-    person.name.toLowerCase().includes(props.filter)
-  );
+  if (props.persons.length) {
+    const filteredPersons = props.persons.filter((person) =>
+      person.name.toLowerCase().includes(props.filter)
+    );
+  
+    return (
+      <>
+        {filteredPersons.map((person) => (
+            <p key={person.id}>
+              {person.name} {person.number}
+            </p>
+          ))}
+      </>
+    )
+  }
 
-  return (
-    <>
-      {filteredPersons.map((person) => (
-          <p key={person.id}>
-            {person.name} {person.number}
-          </p>
-        ))}
-    </>
-  )
 }
 
 const App = () => {
@@ -61,16 +64,13 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
-  const hook = () => {
+  useEffect(() => {
     axios
-      .get('https://scaling-succotash-59wrvpjg64rfvxw-3001.app.github.dev/persons')
+      .get('https://raw.githubusercontent.com/henriquemcmedeiros/FullStackOpenExercises/main/Part2/phonebook/db.json')
       .then(response => {
-        console.log("FULLFILED")
-        setPersons(response.data)
+        setPersons(response.data.persons)
       })
-  }
-  
-  useEffect(hook, [])
+  }, [])
 
   const addPerson = (event) => {
     event.preventDefault()
