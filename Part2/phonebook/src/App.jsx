@@ -66,7 +66,7 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .get('https://raw.githubusercontent.com/henriquemcmedeiros/FullStackOpenExercises/main/Part2/phonebook/db.json')
+      .get('http://localhost:3000/persons')
       .then(response => {
         setPersons(response.data.persons)
       })
