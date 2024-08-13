@@ -62,11 +62,24 @@ const People = (props) => {
   );
 };
 
+const Notification = ({ message }) => {
+  if (!message) {
+    return null
+  }
+
+  return (
+    <div className='messageAdd'>
+      {message}
+    </div>
+  )
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     getPersons()
@@ -89,8 +102,12 @@ const App = () => {
       addPerson(newPerson)
         .then(() => {
           setPersons([...persons, newPerson]);
+          setMessage(`Added ${newPerson.name}`)
           setNewName('');
           setNewNumber('');
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
         })
         .catch(error => console.error('Error adding person:', error));
     } else {
@@ -112,6 +129,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filter={filter} setFilter={setFilter} />
       <h3>add a new</h3>
       <PersonForm onSubmit={handleAddPerson} newName={newName} newNumber={newNumber} setNewName={setNewName} setNewNumber={setNewNumber} />
