@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPersons, addPerson } from './api';
+import { getPersons, addPerson, deletePerson } from './api';
 
 const Filter = (props) => {
   const handlerFilter = (event) => {
@@ -44,12 +44,19 @@ const People = (props) => {
     person.name.toLowerCase().includes(props.filter)
   );
 
+  const handlerDelete = (person) => {
+    props.onDelete(person);
+  };
+
   return (
     <>
       {filteredPersons.map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
+        <div key={person.id}>
+          <p>
+            {person.name} {person.number}
+            <button onClick={() => handlerDelete(person)}>delete</button>
+          </p>
+        </div>
       ))}
     </>
   );
@@ -79,7 +86,7 @@ const App = () => {
     let alreadyExists = persons.some(person => person.name === newPerson.name);
 
     if (!alreadyExists) {
-      addPerson(newPerson, persons)
+      addPerson(newPerson)
         .then(() => {
           setPersons([...persons, newPerson]);
           setNewName('');
@@ -91,6 +98,17 @@ const App = () => {
     }
   };
 
+  const handlerDelete = (personToDelete) => {
+    if (window.confirm(`Delete ${personToDelete.name}?`)) {
+      deletePerson(personToDelete)
+        .then(() => {
+          let filterPeople = persons.filter(person => person.id !== personToDelete.id)
+          setPersons([...filterPeople])
+        })
+        .catch(error => console.error('Error deleting person:', error));
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -98,7 +116,7 @@ const App = () => {
       <h3>add a new</h3>
       <PersonForm onSubmit={handleAddPerson} newName={newName} newNumber={newNumber} setNewName={setNewName} setNewNumber={setNewNumber} />
       <h2>Numbers</h2>
-      <People persons={persons} filter={filter} />
+      <People persons={persons} filter={filter} onDelete={handlerDelete}/>
     </div>
   );
 };
